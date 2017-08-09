@@ -18,5 +18,31 @@
 *.tar.gz
 *.rar
 
+/bin
+/bin-test
+/build
+/doc
+/out
+/report
+/src/ea/test
+/src/ea/example
+
+/.idea
+/.settings
+
+/.classpath
+/.project
+
+*.ipr
+*.iws
+*.iml
+*.class
+
+*.orig
+
+engine-alpha.log
+
+*~
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
