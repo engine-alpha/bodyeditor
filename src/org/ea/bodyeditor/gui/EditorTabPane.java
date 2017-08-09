@@ -18,7 +18,11 @@ extends JTabbedPane {
     }
 
     public void newEditTab(String tabTitle, BodyModel bodyModel) {
-        JScrollPane scrollPane = new JScrollPane(new EditCanvas(bodyModel));
+        EditCanvas editCanvas = new EditCanvas(bodyModel);
+        JScrollPane scrollPane = new JScrollPane(editCanvas);
+        scrollPane.setWheelScrollingEnabled(true);
+        editCanvas.setScrollPane(scrollPane);
+
 
         super.addTab(tabTitle, scrollPane);
     }
