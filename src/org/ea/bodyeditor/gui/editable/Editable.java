@@ -1,6 +1,7 @@
 package org.ea.bodyeditor.gui.editable;
 
 import ea.Punkt;
+import org.ea.bodyeditor.gui.tools.InfoPanel;
 import org.ea.bodyeditor.gui.tools.InfoPanelContent;
 
 import java.awt.*;
@@ -27,6 +28,8 @@ implements Comparable<Editable> {
     public abstract InfoPanelContent generateInfoPanelContent();
 
     protected final EditCanvas chief;
+
+    protected boolean highlighted=false;
 
     //Für Drag Effect
     protected double dX=0, dY=0;
@@ -85,6 +88,12 @@ implements Comparable<Editable> {
     public abstract void processRemove();
 
     /**
+     * Erstellt den Info-Panel-Content, um dieses Objekt zu bearbeiten.
+     * @return Info-Panel-Content, um dieses Objekt zu bearbeiten.
+     */
+    public abstract InfoPanelContent createInfoPanelContent();
+
+    /**
      * Comparable Methode
      * @param other
      * @return
@@ -97,5 +106,18 @@ implements Comparable<Editable> {
             return -1;
         }
         return 0;
+    }
+
+    /**
+     * Setzt, ob dieses Editable-Objekt gerade highlighted werden soll.
+     * @param highlighted
+     */
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
+
+        if(highlighted) {
+            //Update InfoPanel
+
+        }
     }
 }

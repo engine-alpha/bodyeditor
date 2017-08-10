@@ -1,12 +1,18 @@
 package org.ea.bodyeditor.gui.editable;
 
 import ea.raum.*;
+import org.ea.bodyeditor.gui.BodyEditorFrame;
 import org.ea.bodyeditor.gui.BodyModel;
+import org.ea.bodyeditor.gui.action.AddFixtureAction;
+import org.ea.bodyeditor.gui.tools.InfoPanel;
 import org.ea.bodyeditor.gui.tools.Toolbar;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.FixtureDef;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Polygon;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.util.Collections;
@@ -228,28 +234,39 @@ implements MouseListener, MouseMotionListener, MouseWheelListener,ComponentListe
 
     @Override
     public void mousePressed(MouseEvent e) {
+        lastClick = processMousePoint(e.getPoint()); //<- Click auf JPanel
         if(e.getButton() == MouseEvent.BUTTON1) {
-            mousePressed = true;
-            lastClick = processMousePoint(e.getPoint()); //<- Click auf JPanel
 
-            mouse_drag_selection = null;
+            if(Toolbar.getActiveTool() == Toolbar.ToolMode.POLYGON) {
+                //Create default Polygon
+                FixtureDef def = new FixtureDef();
+                PolygonShape polygonShape = new PolygonShape();
+                polygonShape.setAsBox(50, 50, new Vec2((float)lastClick.x, (float)lastClick.y), 45);
+                def.shape = polygonShape;
+                PolygonFixtureProxy pfg = new PolygonFixtureProxy(this, def);
+                BodyEditorFrame.doAction(new AddFixtureAction(pfg, this));
 
-            for(Editable editable : elements) {
-                if(editable.collisionCheck(lastClick)) {
-                    //HIT
-                    switch (Toolbar.getActiveTool()) {
-                        case MOVE:
-                            editable.processDragMoveClick();
-                            mouse_drag_selection = editable;
-                            break;
-                        case REMOVE:
-                            editable.processRemove();
-                            break;
-                    }
-                    return; //Nur ein treffer: Erster ist immer wichtigster (LIST SORT)
-                }
+                return;
             }
+
+            mousePressed = true;
+
             mouse_drag_selection = null;
+
+
+            Editable clicked = findPotentialSelection(lastClick, false);
+            if(clicked == null) return;
+
+            switch (Toolbar.getActiveTool()) {
+                case MOVE:
+                    clicked.processDragMoveClick();
+                    mouse_drag_selection = clicked;
+                    InfoPanel.updateContent(clicked.createInfoPanelContent());
+                    break;
+                case REMOVE:
+                    clicked.processRemove();
+                    break;
+            }
         }
     }
 
@@ -287,7 +304,35 @@ implements MouseListener, MouseMotionListener, MouseWheelListener,ComponentListe
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        ModelPoint mousePosition = processMousePoint(e.getPoint()); //<- Click auf JPanel
+        if(mouse_drag_selection == null) {
+            //Is not dragging => Highlight Selection
 
+            //Update Highlights, ignore Selection for now
+            findPotentialSelection(mousePosition, true);
+
+            this.repaint();
+        }
+    }
+
+    /**
+     * Iteriert alle Editables und gibt die potentielle Auswahl aus.
+     * @param updateHighlights      TRUE= setHighlighted(...) wird korrekt durchgegeben
+     * @param mousePositionOnCanvas Die Mausposition, von der ausgegangen wird.
+     * @return                      null (= kein Editable gefunden) oder das auszuwählende Editable.
+     */
+    private Editable findPotentialSelection(ModelPoint mousePositionOnCanvas, boolean updateHighlights) {
+        Editable result = null;
+        for(Editable editable : elements) {
+            if(result==null && editable.collisionCheck(mousePositionOnCanvas)) {
+                //System.out.println("HIGHLIGHT " + editable);
+                result = editable;
+                if(updateHighlights) editable.setHighlighted(true);
+            } else {
+                if(updateHighlights) editable.setHighlighted(false);
+            }
+        }
+        return result;
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Main {
         }
 
         //Create and set up frame
-        BodyEditorFrame frame = new BodyEditorFrame();
+        BodyEditorFrame frame = BodyEditorFrame.FRAME_INSTANCE;
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocation(200, 200);
 

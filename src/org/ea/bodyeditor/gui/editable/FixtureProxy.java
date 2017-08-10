@@ -3,10 +3,13 @@ package org.ea.bodyeditor.gui.editable;
 import ea.raum.Raum;
 import org.ea.bodyeditor.gui.BodyEditorFrame;
 import org.ea.bodyeditor.gui.action.RemoveFixtureAction;
+import org.ea.bodyeditor.gui.tools.InfoPanel;
+import org.ea.bodyeditor.gui.tools.InfoPanelContent;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 
@@ -76,4 +79,43 @@ extends Editable {
     }
 
     public abstract Collection<PointProxy> subPoints();
+
+
+    /* UI */
+
+    @Override
+    public InfoPanelContent createInfoPanelContent() {
+        InfoPanelContent ret = new InfoPanelContent();
+
+        ret.setLayout(new BorderLayout());
+        ret.add(InfoPanel.createTitle(getFixtureProxyTitle()), BorderLayout.NORTH);
+
+        JPanel spinners = new JPanel();
+        spinners.setLayout(new GridLayout(4,3));
+
+        JSpinner densitySpinner = new JSpinner(createDensitiySpinnerNumberModel());
+        densitySpinner.setValue(fixtureDef.density);
+
+        spinners.add(InfoPanel.createText("Dichte:"));
+        spinners.add(densitySpinner);
+        spinners.add(InfoPanel.createText("kg/m²"));
+
+        spinners.setMaximumSize(new Dimension(150, 1000));
+        ret.add(spinners);
+
+        return ret;
+    }
+
+    private static SpinnerNumberModel createDensitiySpinnerNumberModel() {
+        SpinnerNumberModel ret = new SpinnerNumberModel();
+        ret.setMinimum(0);
+        ret.setMaximum(100000);
+        return ret;
+    }
+
+    /**
+     * Für die Angabe des korrekten Titels im UI
+     * @return
+     */
+    protected abstract String getFixtureProxyTitle();
 }

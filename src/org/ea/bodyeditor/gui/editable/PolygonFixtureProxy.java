@@ -1,12 +1,16 @@
 package org.ea.bodyeditor.gui.editable;
 
+import com.sun.jmx.remote.security.JMXPluggableAuthenticator;
 import org.ea.bodyeditor.gui.BodyEditorFrame;
 import org.ea.bodyeditor.gui.action.ChangePolyShapeAction;
+import org.ea.bodyeditor.gui.tools.InfoPanel;
 import org.ea.bodyeditor.gui.tools.InfoPanelContent;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 
+import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -47,6 +51,11 @@ extends FixtureProxy {
         return pointProxyList;
     }
 
+    @Override
+    protected String getFixtureProxyTitle() {
+        return "Polygon-Fixture";
+    }
+
     public void setShape(PolygonShape shape) {
         removeAllPointProxies();
         polygonShape = shape;
@@ -54,7 +63,7 @@ extends FixtureProxy {
         Vec2[] vecs = polygonShape.getVertices();
         for(int i = 0; i < polygonShape.getVertexCount(); i++) {
             PointProxy pointProxy = new PointProxy(chief, this);
-            pointProxy.setCoordinates(vecs[i].x, vecs[i].y);
+            pointProxy.setCoordinatesInternally(vecs[i].x, vecs[i].y);
             chief.addEditableElement(pointProxy);
             pointProxyList.add(pointProxy);
         }
@@ -99,9 +108,11 @@ extends FixtureProxy {
         graphics2D.setColor(dragged? shapeDragColor : shapeFillColor);
         graphics2D.fillPolygon(xs, ys, xs.length);
 
-        graphics2D.setColor(shapeStrokeColor);
-        graphics2D.setStroke(new BasicStroke(2));
-        graphics2D.drawPolygon(xs, ys, xs.length);
+        if(highlighted) {
+            graphics2D.setColor(shapeStrokeColor);
+            graphics2D.setStroke(new BasicStroke(2));
+            graphics2D.drawPolygon(xs, ys, xs.length);
+        }
     }
 
     @Override
@@ -139,4 +150,11 @@ extends FixtureProxy {
         dragged=false;
     }
 
+
+
+    public PolygonShape getShapeWithout(PointProxy pointProxy) {
+        pointProxyList.remove(pointProxy);
+        chief.removeEditableElement(pointProxy);
+        return this.createShapeFromCurrentPoints();
+    }
 }

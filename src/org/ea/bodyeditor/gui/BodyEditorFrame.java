@@ -1,10 +1,12 @@
 package org.ea.bodyeditor.gui;
 
 import ea.raum.Raum;
+import org.ea.bodyeditor.gui.tools.InfoPanel;
 import org.ea.bodyeditor.gui.tools.Toolbar;
 
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
 import javax.tools.Tool;
 import java.awt.*;
@@ -45,7 +47,9 @@ extends JFrame  {
 
     private final EditorTabPane tabPane;
 
-    public BodyEditorFrame() {
+    public static final BodyEditorFrame FRAME_INSTANCE=new BodyEditorFrame();
+
+    private BodyEditorFrame() {
         super(FRAME_TITLE);
 
         //Create MenuBar
@@ -57,11 +61,12 @@ extends JFrame  {
         super.getContentPane().setLayout(new BorderLayout());
         super.getContentPane().add(toolbar= Toolbar.getToolbar(), BorderLayout.WEST);
         super.getContentPane().add(tabPane=new EditorTabPane(), BorderLayout.CENTER);
+        super.getContentPane().add(InfoPanel.getInfoPanel(), BorderLayout.EAST);
 
 
         //Dimension Setting
         super.setMinimumSize(new Dimension(400, 400));
-        super.setPreferredSize(new Dimension(850, 650));
+        super.setPreferredSize(new Dimension(1080, 800));
 
         pack();
     }
