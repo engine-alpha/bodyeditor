@@ -3,20 +3,23 @@ package org.ea.bodyeditor.gui;
 import ea.raum.Raum;
 import org.ea.bodyeditor.gui.tools.Toolbar;
 
+
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.filechooser.FileFilter;
+import javax.tools.Tool;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
+import java.util.Stack;
+
+import org.ea.bodyeditor.gui.action.Action;
 
 /**
  * The Software's main frame. Contains all UI Elements.
  * Created by Michael on 08.08.2017.
  */
 public class BodyEditorFrame
-extends JFrame {
+extends JFrame  {
 
     /**
      * Software's Frame Title
@@ -27,6 +30,18 @@ extends JFrame {
      * Die Toolbar des Editors
      */
     private final Toolbar toolbar;
+
+    /**
+     * Checkbox für Snap funktion
+     */
+    private static JCheckBoxMenuItem snap;
+
+    private static final Stack<Action> undo_stack = new Stack<>();
+    private static final Stack<Action> redo_stack = new Stack<>();
+
+    public static boolean isSnapEnabled() {
+        return snap.isSelected();
+    }
 
     private final EditorTabPane tabPane;
 
@@ -40,17 +55,40 @@ extends JFrame {
 
         //Create Content
         super.getContentPane().setLayout(new BorderLayout());
-        super.getContentPane().add(toolbar=new Toolbar(), BorderLayout.WEST);
+        super.getContentPane().add(toolbar= Toolbar.getToolbar(), BorderLayout.WEST);
         super.getContentPane().add(tabPane=new EditorTabPane(), BorderLayout.CENTER);
 
 
         //Dimension Setting
         super.setMinimumSize(new Dimension(400, 400));
         super.setPreferredSize(new Dimension(850, 650));
+
         pack();
     }
 
 
+    /* DO & UNDO */
+
+    public static void doAction(Action a) {
+        a.doAction();
+        undo_stack.add(a);
+        redo_stack.removeAllElements();
+    }
+
+    public static void undoAction() {
+        if(undo_stack.isEmpty()) return;
+        Action a = undo_stack.pop();
+        redo_stack.add(a);
+        a.undoAction();
+    }
+
+    public static void redoAction() {
+        if(redo_stack.isEmpty()) return;
+        Action a = redo_stack.pop();
+        if(a == null) return;
+        undo_stack.add(a);
+        a.doAction();
+    }
 
     /* MENU BAR */
 
@@ -71,7 +109,11 @@ extends JFrame {
         //Bearbeiten
         JMenu bearbeiten = new JMenu("Bearbeiten");
 
-
+        JMenuItem doA, undoA;
+        bearbeiten.add(doA = createMenuItem("Rückgängig", () -> undoAction()));
+        doA.setAccelerator(KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
+        bearbeiten.add(undoA = createMenuItem("Wiederherstellen", () -> redoAction()));
+        undoA.setAccelerator(KeyStroke.getKeyStroke('Y', Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask()));
 
         jMenuBar.add(bearbeiten);
 
@@ -79,6 +121,14 @@ extends JFrame {
         JMenu ansicht = new JMenu("Ansicht");
 
         jMenuBar.add(ansicht);
+
+        //Tools
+        JMenu tools = new JMenu("Tools");
+
+        snap = new JCheckBoxMenuItem("Snap to Pixel");
+        tools.add(snap);
+
+        jMenuBar.add(tools);
 
         //Hilfe
         JMenu hilfe = new JMenu("Hilfe");

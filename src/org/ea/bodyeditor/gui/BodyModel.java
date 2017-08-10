@@ -1,6 +1,7 @@
 package org.ea.bodyeditor.gui;
 
 import ea.raum.Raum;
+import org.ea.bodyeditor.gui.editable.FixtureProxy;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 
@@ -35,16 +36,17 @@ public class BodyModel {
      */
     public static BodyModel createEmptyBodyModel(Raum raum) {
         BodyModel bodyModel = new BodyModel(raum);
-
-        FixtureDef standard = new FixtureDef();
-        standard.shape = raum.createShape(1); //PPM ist standardmäßig 1. Skalierungsfaktor wird übertragen
-
+        bodyModel.getFixtures().add(FixtureProxy.createStandardFixtureDef(raum));
         return bodyModel;
     }
 
 
     public Raum getRaum() {
         return raum;
+    }
+
+    public List<FixtureDef> getFixtures() {
+        return fixtureDefList;
     }
 
 

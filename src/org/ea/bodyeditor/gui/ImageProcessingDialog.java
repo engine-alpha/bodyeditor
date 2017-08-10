@@ -144,12 +144,12 @@ extends JDialog {
             result = new Bild(file.getAbsolutePath());
         } else {
             try {
-                result = Animation.createFromSpritesheet(500, file.getAbsolutePath(),
-                        (Integer) spritesheetRows.getValue(),
-                        (Integer) spritesheetCols.getValue());
+                result = Animation.createFromSpritesheet(100, file.getAbsolutePath(),
+                        (Integer) spritesheetCols.getValue(),
+                        (Integer) spritesheetRows.getValue());
             } catch (RuntimeException e) {
                 JOptionPane.showMessageDialog(getParent(),
-                        "Die Maße der Bilddatei passen nicht mit der gewählten Rasterung zusammen.",
+                        "Die Maße der Bilddatei passen nicht mit der gewählten Rasterung zusammen: "+e.getMessage(),
                         "Fehler in der Bilddatei", JOptionPane.WARNING_MESSAGE);
             }
         }

@@ -27,4 +27,9 @@ extends JTabbedPane {
         super.addTab(tabTitle, scrollPane);
     }
 
+
+    public EditCanvas getCurrentTab() {
+        return (EditCanvas)super.getTabComponentAt(getSelectedIndex());
+    }
+
 }

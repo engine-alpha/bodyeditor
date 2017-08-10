@@ -29,6 +29,11 @@ public class Main {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocation(200, 200);
 
+        if(args.length != 0) {
+            //First Argument = File to load
+            //TODO
+        }
+
         //Visualize Frame
         frame.setVisible(true);
     }
